@@ -3,6 +3,7 @@ __author__ = 'rishikadhody'
 # all the imports
 import os
 import sqlite3
+import json
 from flask import Flask, request, session, g, redirect, url_for, abort, \
     render_template, flash
 
@@ -63,8 +64,23 @@ def add_entry():
     if not session.get('logged_in'):
         abort(401)
     db = get_db()
+    print(request.form)
     db.execute('insert into entries (title, text) values (?, ?)',
                  [request.form['title'], request.form['text']])
+    db.commit()
+    flash('New entry was successfully posted')
+    return redirect(url_for('show_entries'))
+
+@app.route('/add/json', methods=['POST'])
+def add_entry_json():
+    if not session.get('logged_in'):
+        abort(401)
+    content = request.get_json(silent=True)
+    decoded_content = json.dumps(content,encoding="unicode")
+    decoded_content = json.loads(decoded_content)
+    db = get_db()
+    db.execute('insert into entries (title, text) values (?, ?)',
+                 [decoded_content["title"], decoded_content["text"]])
     db.commit()
     flash('New entry was successfully posted')
     return redirect(url_for('show_entries'))
