@@ -1,0 +1,3 @@
+graft trackerAPI/templates
+graft trackerAPI/static
+include trackerAPI/schema.sql
